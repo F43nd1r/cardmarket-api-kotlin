@@ -2,8 +2,6 @@ package com.faendir.cardmarket.service
 
 import com.faendir.cardmarket.config.CardmarketApiConfiguration
 import com.faendir.cardmarket.model.*
-import com.faendir.cardmarket.util.leafs
-import com.faendir.cardmarket.util.tree
 
 /**
  * @author lukas
@@ -12,66 +10,78 @@ import com.faendir.cardmarket.util.tree
 class WantsListService(config: CardmarketApiConfiguration) : AbstractService(config) {
     fun getWantsLists(): List<WantsList> = get("wantslist").submit("wantslist") ?: emptyList()
 
-    fun createWantsList(game: Game, name: String) = post("wantslist").body(tree("wantslist") {
-        node(leafs("name", name))
-        node(leafs("idGame", game.idGame.toString()))
-    }).submit() ?: Unit
+    fun createWantsList(game: Game, name: String) = post("wantslist").body {
+        "wantslist" {
+            element("name", name)
+            element("idGame", game.idGame)
+        }
+    }.submit() ?: Unit
 
     fun getWantsList(wantsList: WantsList) = getWantsList(wantsList.idWantslist)!!
 
     fun getWantsList(id: Int): WantsList? = get("wantslist/$id").submit("wantslist")
 
-    fun changeName(wantsList: WantsList, name: String): WantsList? = put("wantslist/${wantsList.idWantslist}")
-            .body(leafs("action", "editWantslist"), leafs("name", name)).submit("wantslist")
+    fun changeName(wantsList: WantsList, name: String): WantsList? = put("wantslist/${wantsList.idWantslist}").body {
+        element("action", "editWantslist")
+        element("name", name)
+    }.submit("wantslist")
 
-    fun addItems(wantsList: WantsList, vararg items: WantsListItem): WantsList? = put("wantslist/${wantsList.idWantslist}").body(leafs("action", "addItem"),
-            *(items.map {
-                when (it) {
-                    is MetaproductWant -> tree("metaproduct") {
-                        node(leafs("idMetaproduct", it.idMetaproduct.toString()))
-                        node(leafs("count", it.count.toString()))
-                        node(leafs("minCondition", it.minCondition.toString()))
-                        node(leafs("wishPrice", it.wishPrice.toString()))
-                        node(leafs("mailAlert", it.mailAlert.toString()))
-                        node(leafs("idLanguage", it.languages.toString()))
-                        node(leafs("isFoil", it.isFoil.toString()))
-                        node(leafs("isAltered", it.isAltered.toString()))
-                        node(leafs("isSigned", it.isSigned.toString()))
-                        node(leafs("isFirstEd", it.isFirstEd.toString()))
-                    }
-                    is ProductWant -> tree("product") {
-                        node(leafs("idProduct", it.idProduct.toString()))
-                        node(leafs("count", it.count.toString()))
-                        node(leafs("minCondition", it.minCondition.toString()))
-                        node(leafs("wishPrice", it.wishPrice.toString()))
-                        node(leafs("mailAlert", it.mailAlert.toString()))
-                        node(leafs("idLanguage", it.languages.toString()))
-                        node(leafs("isFoil", it.isFoil.toString()))
-                        node(leafs("isAltered", it.isAltered.toString()))
-                        node(leafs("isSigned", it.isSigned.toString()))
-                        node(leafs("isFirstEd", it.isFirstEd.toString()))
-                    }
-                    else -> throw IllegalArgumentException()
+    fun addItems(wantsList: WantsList, vararg items: WantsListItem): WantsList? = put("wantslist/${wantsList.idWantslist}").body {
+        element("action", "addItem")
+        items.forEach {
+            when (it) {
+                is MetaproductWant -> "metaproduct"{
+                    element("idMetaproduct", it.idMetaproduct)
+                    element("count", it.count)
+                    element("minCondition", it.minCondition)
+                    element("wishPrice", it.wishPrice)
+                    element("mailAlert", it.mailAlert)
+                    element("idLanguage", it.languages)
+                    element("isFoil", it.isFoil)
+                    element("isAltered", it.isAltered)
+                    element("isSigned", it.isSigned)
+                    element("isFirstEd", it.isFirstEd)
                 }
-            }.toTypedArray())).submit("wantslist")
+                is ProductWant -> "product" {
+                    element("idProduct", it.idProduct)
+                    element("count", it.count)
+                    element("minCondition", it.minCondition)
+                    element("wishPrice", it.wishPrice)
+                    element("mailAlert", it.mailAlert)
+                    element("idLanguage", it.languages)
+                    element("isFoil", it.isFoil)
+                    element("isAltered", it.isAltered)
+                    element("isSigned", it.isSigned)
+                    element("isFirstEd", it.isFirstEd)
+                }
+                else -> throw IllegalArgumentException()
+            }
+        }
+    }.submit("wantslist")
 
-    fun editItem(wantsList: WantsList, wantsListItem: WantsListItem): WantsList? = put("wantslist/${wantsList.idWantslist}").body(leafs("action", "editItem"),
-            tree("want") {
-                node(leafs("idWant", wantsListItem.idWant.toString()))
-                node(leafs("count", wantsListItem.count.toString()))
-                node(leafs("minCondition", wantsListItem.minCondition.toString()))
-                node(leafs("wishPrice", wantsListItem.wishPrice.toString()))
-                node(leafs("mailAlert", wantsListItem.mailAlert.toString()))
-                node(leafs("idLanguage", wantsListItem.languages.toString()))
-                node(leafs("isFoil", wantsListItem.isFoil.toString()))
-                node(leafs("isAltered", wantsListItem.isAltered.toString()))
-                node(leafs("isSigned", wantsListItem.isSigned.toString()))
-                node(leafs("isFirstEd", wantsListItem.isFirstEd.toString()))
-            }).submit("wantslist")
+    fun editItem(wantsList: WantsList, wantsListItem: WantsListItem): WantsList? = put("wantslist/${wantsList.idWantslist}").body {
+        element("action", "editItem")
+        "want" {
+            element("idWant", wantsListItem.idWant)
+            element("count", wantsListItem.count)
+            element("minCondition", wantsListItem.minCondition)
+            element("wishPrice", wantsListItem.wishPrice)
+            element("mailAlert", wantsListItem.mailAlert)
+            element("idLanguage", wantsListItem.languages)
+            element("isFoil", wantsListItem.isFoil)
+            element("isAltered", wantsListItem.isAltered)
+            element("isSigned", wantsListItem.isSigned)
+            element("isFirstEd", wantsListItem.isFirstEd)
+        }
+    }.submit("wantslist")
 
     fun deleteItem(wantsList: WantsList, wantsListItem: WantsListItem): WantsList? = put("wantslist/${wantsList.idWantslist}")
-            .body(leafs("action", "deleteItem"), tree("want") { node(leafs("idWant", wantsListItem.idWant)) }).submit("wantslist")
+            .body {
+                element("action", "deleteItem")
+                "want" {
+                    element("idWant", wantsListItem.idWant)
+                }
+            }.submit("wantslist")
 
     fun deleteWantsList(wantsList: WantsList) = delete("wantslist/${wantsList.idWantslist}").submit() ?: Unit
-
 }

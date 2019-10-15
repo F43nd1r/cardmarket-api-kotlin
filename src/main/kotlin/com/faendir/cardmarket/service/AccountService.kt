@@ -7,7 +7,6 @@ import com.faendir.cardmarket.model.Account
 import com.faendir.cardmarket.model.DisplayLanguage
 import com.faendir.cardmarket.model.Message
 import com.faendir.cardmarket.model.MessageThread
-import com.faendir.cardmarket.util.leafs
 import java.time.OffsetDateTime
 
 /**
@@ -32,7 +31,7 @@ class AccountService(config: CardmarketApiConfiguration) : AbstractService(confi
 
     fun getMessage(idOtherUser: Int, idMessage: String): MessageThread? = get("account/messages/$idOtherUser/$idMessage").submit()
 
-    fun sendMessage(idOtherUser: Int, message: String): Unit = post("account/messages/$idOtherUser").body(leafs("message", message)).submit() ?: Unit
+    fun sendMessage(idOtherUser: Int, message: String): Unit = post("account/messages/$idOtherUser").body { element("message", message) }.submit() ?: Unit
 
     fun deleteMessageThread(idOtherUser: Int) = delete("account/messages/$idOtherUser").submit() ?: Unit
 

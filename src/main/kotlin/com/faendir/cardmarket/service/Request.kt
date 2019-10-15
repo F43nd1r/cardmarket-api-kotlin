@@ -1,7 +1,6 @@
 package com.faendir.cardmarket.service
 
 import com.faendir.cardmarket.config.CardmarketApiConfiguration
-import com.faendir.cardmarket.util.Tree
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
@@ -11,6 +10,8 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Request
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import org.redundent.kotlin.xml.Node
+import org.redundent.kotlin.xml.xml
 import java.io.EOFException
 import java.net.URLEncoder
 import java.util.*
@@ -25,7 +26,7 @@ class Request(private val config: CardmarketApiConfiguration,
               private val method: Method,
               private val path: String,
               private var params: Map<String, *> = emptyMap<String, String>(),
-              private var body: Tree<String>? = null) {
+              private var body: Node? = null) {
     private val logger: Logger = LogManager.getLogger(javaClass)
     val mapper: ObjectMapper = ObjectMapper().registerKotlinModule()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -34,7 +35,7 @@ class Request(private val config: CardmarketApiConfiguration,
 
     fun params(vararg params: Pair<String, *>) = apply { this.params = params.filter { it.second != null }.toMap() }
 
-    fun body(vararg body: Tree<String>) = apply { this.body = Tree("request", body.toList()) }
+    fun body(body: (Node.() -> Unit)?) = apply { this.body = xml("request", init = body) }
 
     inline fun <reified T : Any> submit() = perform { mapper.readValue(it, jacksonTypeRef<T>()) }
 
@@ -60,23 +61,15 @@ class Request(private val config: CardmarketApiConfiguration,
                 else -> resultExtractor.invoke(it)
             }
         }, {
-            if(it.cause?.cause !is EOFException) {
+            if (it.cause?.cause !is EOFException) {
                 logger.warn(it)
             }
             null
         })
     }
 
-    private fun toXml(content: Tree<String>): String {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" + toXmlImpl(listOf(content))
-    }
-
-    private fun toXmlImpl(content: List<Tree<String>>): String {
-        return content.joinToString {
-            if (it.children.isEmpty()) it.data
-            else
-                "<${it.data}>" + (toXmlImpl(it.children)) + "</${it.data}>\n"
-        }
+    private fun toXml(content: Node): String {
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" + content.toString(false)
     }
 
     private fun encode(s: String): String = URLEncoder.encode(s, Charsets.UTF_8.name()).replace("+", "%20").replace("'", "%27")
@@ -107,4 +100,9 @@ enum class Method(val fuel: (String) -> Request) {
     PUT({ Fuel.put(it) }),
     POST({ Fuel.post(it) }),
     DELETE({ Fuel.delete(it) })
+}
+
+fun Node.element(name: String, value: Any) = element(name, value.toString())
+fun Node.element(name: String, value: Any?) {
+    if (value != null) element(name, value)
 }

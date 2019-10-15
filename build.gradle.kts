@@ -1,8 +1,9 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
-    application
     kotlin("jvm") version "1.3.50"
 }
 
@@ -16,10 +17,6 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    implementation("com.massisframework:j-text-utils:0.3.4")
-    implementation("info.picocli:picocli:4.0.0-beta-2")
-    implementation("org.jsoup:jsoup:1.12.1")
-    implementation("com.google.guava:guava:28.0-jre")
     val jacksonVersion = "2.10.0"
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
@@ -29,6 +26,7 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-api:2.12.1")
     implementation("org.apache.logging.log4j:log4j-core:2.12.1")
     implementation("com.natpryce:konfig:1.6.10.0")
+    implementation("org.redundent:kotlin-xml-builder:1.5.3")
 
     val junitVersion = "5.5.2"
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
@@ -37,6 +35,10 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    testLogging {
+        events.add(TestLogEvent.FAILED)
+        exceptionFormat = TestExceptionFormat.FULL
+    }
     /*systemProperty("http.proxyHost", "localhost")
     systemProperty("http.proxyPort", "8888")
     systemProperty("https.proxyHost", "localhost")
@@ -45,10 +47,6 @@ tasks.withType<Test> {
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
-}
-
-application {
-    mainClassName = "com.faendir.cardmarket.cli.Main"
 }
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
