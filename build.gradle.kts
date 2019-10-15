@@ -20,7 +20,9 @@ dependencies {
     implementation("info.picocli:picocli:4.0.0-beta-2")
     implementation("org.jsoup:jsoup:1.12.1")
     implementation("com.google.guava:guava:28.0-jre")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.0")
+    val jacksonVersion = "2.10.0"
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     val fuelVersion = "2.2.1"
     implementation("com.github.kittinunf.fuel:fuel:$fuelVersion")
     implementation("com.github.kittinunf.fuel:fuel-jackson:$fuelVersion")
@@ -35,6 +37,10 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    /*systemProperty("http.proxyHost", "localhost")
+    systemProperty("http.proxyPort", "8888")
+    systemProperty("https.proxyHost", "localhost")
+    systemProperty("https.proxyPort", "8888")*/
 }
 
 java {

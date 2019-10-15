@@ -1,6 +1,9 @@
 package com.faendir.cardmarket.model
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonProperty
+import java.time.OffsetDateTime
 
 /**
  * @author lukas
@@ -19,13 +22,16 @@ data class Account(override val idUser: Int,
                    override val soldItems: Int,
                    override val avgShippingTime: Int,
                    override val onVacation: Boolean,
-                   val idDisplayLanguage: DisplayLanguage,
+                   @JsonProperty("idDisplayLanguage")
+                   val displayLanguage: DisplayLanguage,
                    override val name: Name,
                    val homeAddress: Address,
                    override val email: String,
-                   val phoneNumber: String,
+                   @JsonProperty("phoneNumber")
+                   override val phone: String?,
                    override val vat: String?,
-                   val registerDate: String,
+                   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZZ")
+                   val registerDate: OffsetDateTime,
                    val isActivated: Boolean,
                    val moneyDetails: MoneyDetails,
                    val bankAccount: BankAccount,

@@ -18,6 +18,7 @@ abstract class AbstractUser {
     abstract val onVacation: Boolean
     abstract val name: Name
     abstract val email: String
+    abstract val phone: String?
     abstract val vat: String?
 }
 

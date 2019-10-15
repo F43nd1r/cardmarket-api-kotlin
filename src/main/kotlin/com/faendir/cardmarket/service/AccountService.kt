@@ -7,41 +7,41 @@ import com.faendir.cardmarket.model.Account
 import com.faendir.cardmarket.model.DisplayLanguage
 import com.faendir.cardmarket.model.Message
 import com.faendir.cardmarket.model.MessageThread
+import com.faendir.cardmarket.util.leafs
 import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
 
 /**
  * @author lukas
  * @since 02.10.19
  */
 class AccountService(config: CardmarketApiConfiguration) : AbstractService(config) {
-    fun getAccount(): Account? = get("account", "account")
+    fun getAccount(): Account? = get("account").submit("account")
 
     fun setOnVacation(onVacation: Boolean, cancelOrders: Boolean? = null, relistItems: Boolean? = null): Account? =
-            put("account/vacation?" + mapOf(
+            put("account/vacation").params(
                     "onVacation" to onVacation,
                     "cancelOrders" to cancelOrders,
                     "relistItems" to relistItems
-            ).entries.filter { it.value != null }.joinToString(separator = "&") { "${it.key}=${it.value}" }, "account")
+            ).submit("account")
 
-    fun setDisplayLanguage(displayLanguage: DisplayLanguage): Account? = put("account/language?idDisplayLanguage=$displayLanguage", "account")
+    fun setDisplayLanguage(displayLanguage: DisplayLanguage): Account? = put("account/language").params("idDisplayLanguage" to displayLanguage).submit("account")
 
-    fun getMessageThreads(): List<MessageThread> = get("account/messages", "thread") ?: emptyList()
+    fun getMessageThreads(): List<MessageThread> = get("account/messages").submit("thread") ?: emptyList()
 
-    fun getMessageThread(idOtherUser: Int): MessageThread? = get("account/messages/$idOtherUser", null)
+    fun getMessageThread(idOtherUser: Int): MessageThread? = get("account/messages/$idOtherUser").submit()
 
-    fun getMessage(idOtherUser: Int, idMessage: String): MessageThread? = get("account/messages/$idOtherUser/$idMessage", "message")
+    fun getMessage(idOtherUser: Int, idMessage: String): MessageThread? = get("account/messages/$idOtherUser/$idMessage").submit()
 
-    fun sendMessage(idOtherUser: Int, message: String): Unit = post("account/messages/$idOtherUser", "message" to message)
+    fun sendMessage(idOtherUser: Int, message: String): Unit = post("account/messages/$idOtherUser").body(leafs("message", message)).submit() ?: Unit
 
-    fun deleteMessageThread(idOtherUser: Int) = delete("account/messages/$idOtherUser")
+    fun deleteMessageThread(idOtherUser: Int) = delete("account/messages/$idOtherUser").submit() ?: Unit
 
-    fun deleteMessage(idOtherUser: Int, idMessage: String) = delete("account/messages/$idOtherUser/$idMessage")
+    fun deleteMessage(idOtherUser: Int, idMessage: String) = delete("account/messages/$idOtherUser/$idMessage").submit() ?: Unit
 
     fun findMessages(unread: Boolean? = null, startDate: OffsetDateTime? = null, endDate: OffsetDateTime? = null): List<Message> =
-            get("account/messages/find?" + mapOf("unread" to unread,
-                    "startDate" to startDate?.withNano(0)?.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
-                    "endDate" to endDate?.withNano(0)?.format(DateTimeFormatter.ISO_DATE_TIME))
-                    .entries.filter { it.value != null }.joinToString(separator = "&") { "${it.key}=${it.value}" }, "message") ?: emptyList()
-
+            get("account/messages/find").params(
+                    "unread" to unread,
+                    "startDate" to startDate?.format(formatter),
+                    "endDate" to endDate?.format(formatter)
+            ).submit("message") ?: emptyList()
 }
