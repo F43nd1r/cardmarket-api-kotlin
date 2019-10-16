@@ -96,8 +96,8 @@ val publication = publishing.publications.create("maven", MavenPublication::clas
 }
 
 bintray {
-    user = project.findProperty("artifactoryUser") as String?
-    key = project.findProperty("artifactoryApiKey") as String?
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_API_KEY")
     setPublications(publication.name)
     publish = true
     pkg(delegateClosureOf<BintrayExtension.PackageConfig> {
@@ -112,6 +112,7 @@ bintray {
 
 release {
     tagTemplate = "v\$version"
+    buildTasks = listOf("assemble")
 }
 
 tasks["afterReleaseBuild"].dependsOn(tasks["bintrayUpload"])
