@@ -1,14 +1,16 @@
+import com.jfrog.bintray.gradle.BintrayExtension
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    java
     kotlin("jvm") version "1.3.50"
+    `maven-publish`
+    id("net.researchgate.release") version "2.8.1"
+    id("com.jfrog.bintray") version "1.8.4"
 }
 
 group = "com.faendir"
-version = "1.0-SNAPSHOT"
 
 repositories {
     jcenter()
@@ -48,9 +50,6 @@ tasks.withType<Test> {
     systemProperty("https.proxyPort", "8888")*/
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-}
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
     jvmTarget = "1.8"
@@ -59,3 +58,60 @@ val compileTestKotlin: KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
     jvmTarget = "1.8"
 }
+
+ tasks.register<Jar>("sourcesJar") {
+    archiveClassifier.set("sources")
+    from(sourceSets.main.get().allSource)
+}
+
+val publication = publishing.publications.create("maven", MavenPublication::class) {
+    from(components["kotlin"])
+    artifact(tasks["sourcesJar"])
+    pom {
+        groupId = project.group.toString()
+        artifactId = project.name
+        name.set(project.name)
+        description.set("Kotlin API for cardmarket.com")
+        url.set("https://github.com/F43nd1r/cardmarket-api-kotlin")
+        licenses {
+            license {
+                name.set("Apache-2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                distribution.set("repo")
+            }
+        }
+        developers {
+            developer {
+                id.set("F43nd1r")
+                name.set("Lukas Morawietz")
+                email.set("support@faendir.com")
+            }
+        }
+        scm {
+            connection.set("scm:git:git@github.com:F43nd1r/cardmarket-api-kotlin.git")
+            developerConnection.set("scm:git:git@github.com:F43nd1r/cardmarket-api-kotlin.git")
+            url.set("https://github.com/F43nd1r/cardmarket-api-kotlin.git")
+        }
+    }
+}
+
+bintray {
+    user = project.findProperty("artifactoryUser") as String?
+    key = project.findProperty("artifactoryApiKey") as String?
+    setPublications(publication.name)
+    publish = true
+    pkg(delegateClosureOf<BintrayExtension.PackageConfig> {
+        repo = "maven"
+        val pom = publication.pom
+        name = pom.name.get()
+        websiteUrl = pom.url.get()
+        vcsUrl = pom.url.get()
+        setLicenses("Apache-2.0")
+    })
+}
+
+release {
+    tagTemplate = "v\$version"
+}
+
+tasks["afterReleaseBuild"].dependsOn(tasks["bintrayUpload"])
