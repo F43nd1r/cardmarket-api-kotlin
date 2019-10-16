@@ -114,5 +114,3 @@ release {
     tagTemplate = "v\$version"
     buildTasks = listOf("assemble")
 }
-
-tasks["afterReleaseBuild"].dependsOn(tasks["bintrayUpload"])
