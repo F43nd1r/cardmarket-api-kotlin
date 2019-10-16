@@ -22,7 +22,7 @@ import javax.crypto.spec.SecretKeySpec
  * @author lukas
  * @since 15.10.19
  */
-class Request(private val config: CardmarketApiConfiguration,
+internal class Request(private val config: CardmarketApiConfiguration,
               private val method: Method,
               private val path: String,
               private var params: Map<String, *> = emptyMap<String, String>(),
@@ -37,14 +37,17 @@ class Request(private val config: CardmarketApiConfiguration,
 
     fun body(body: (Node.() -> Unit)?) = apply { this.body = xml("request", init = body) }
 
-    inline fun <reified T : Any> submit() = perform { mapper.readValue(it, jacksonTypeRef<T>()) }
+    inline fun <reified T : Any> submit() = submit { mapper, map -> mapper.convertValue(map, jacksonTypeRef<T>()) }
 
     inline fun <reified T : Any> submit(responseKey: String) = submit { mapper, map -> mapper.convertValue(map[responseKey], jacksonTypeRef<T>()) }
 
     inline fun <reified T : Any> submit(crossinline resultExtractor: (ObjectMapper, Map<String, Any>) -> T?) = perform {
         val map: Map<String, Any> = mapper.readValue(it, jacksonTypeRef<Map<String, Any>>())
         if(map.containsKey("errors")) {
-            logger.warn(map["errors"])
+            logger.warn("errors: " + map["errors"])
+        }
+        if(map.containsKey("result") && map["result"].toString() != "null" && map["result"].toString() != "[]") {
+            logger.info("result: " + map["result"])
         }
         resultExtractor.invoke(mapper, map)
     }
