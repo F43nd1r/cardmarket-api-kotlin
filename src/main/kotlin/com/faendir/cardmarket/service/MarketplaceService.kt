@@ -41,8 +41,7 @@ class MarketplaceService(config: CardmarketApiConfiguration) : AbstractService(c
                     "start" to partial?.first,
                     "maxResults" to partial?.second).submit("article") ?: emptyList()
 
-    fun getMetaproduct(id: Int): Metaproduct? = get("metaproducts/$id").submit { mapper, it ->
-        val map = mapper.readValue(it, jacksonTypeRef<Map<String, Any>>())
+    fun getMetaproduct(id: Int): Metaproduct? = get("metaproducts/$id").submit { mapper, map ->
         val metaproduct: Metaproduct? = mapper.convertValue(map["metaproduct"], jacksonTypeRef<Metaproduct>())
         metaproduct?.copy(products = mapper.convertValue(map["product"], jacksonTypeRef<List<Product>>()))
     }
@@ -51,7 +50,13 @@ class MarketplaceService(config: CardmarketApiConfiguration) : AbstractService(c
             get("metaproducts/find").params("search" to search,
                     "exact" to exact,
                     "idGame" to idGame,
-                    "idLanguage" to idLanguage).submit("metaproduct") ?: emptyList()
+                    "idLanguage" to idLanguage).submit { mapper, map ->
+                val list = mapper.convertValue(map["metaproduct"], jacksonTypeRef<List<Map<String, Any>>>())
+                list.mapNotNull {
+                    val metaproduct: Metaproduct? = mapper.convertValue(it["metaproduct"], jacksonTypeRef<Metaproduct>())
+                    metaproduct?.copy(products = mapper.convertValue(it["product"], jacksonTypeRef<List<Product>>()))
+                }
+            } ?: emptyList()
 
     fun getUser(id: Int): User? = get("users/$id").submit("user")
 

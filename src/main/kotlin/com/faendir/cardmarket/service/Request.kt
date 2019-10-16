@@ -27,7 +27,7 @@ class Request(private val config: CardmarketApiConfiguration,
               private val path: String,
               private var params: Map<String, *> = emptyMap<String, String>(),
               private var body: Node? = null) {
-    private val logger: Logger = LogManager.getLogger(javaClass)
+    val logger: Logger = LogManager.getLogger(javaClass)
     val mapper: ObjectMapper = ObjectMapper().registerKotlinModule()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
@@ -39,12 +39,15 @@ class Request(private val config: CardmarketApiConfiguration,
 
     inline fun <reified T : Any> submit() = perform { mapper.readValue(it, jacksonTypeRef<T>()) }
 
-    inline fun <reified T : Any> submit(responseKey: String) = perform {
-        val map: Map<String, Any> = mapper.readValue(it, jacksonTypeRef<Map<String, Any>>())
-        mapper.convertValue(map[responseKey], jacksonTypeRef<T>())
-    }
+    inline fun <reified T : Any> submit(responseKey: String) = submit { mapper, map -> mapper.convertValue(map[responseKey], jacksonTypeRef<T>()) }
 
-    inline fun <reified T : Any> submit(crossinline resultExtractor: (ObjectMapper, String) -> T?) = perform { resultExtractor.invoke(mapper, it) }
+    inline fun <reified T : Any> submit(crossinline resultExtractor: (ObjectMapper, Map<String, Any>) -> T?) = perform {
+        val map: Map<String, Any> = mapper.readValue(it, jacksonTypeRef<Map<String, Any>>())
+        if(map.containsKey("errors")) {
+            logger.warn(map["errors"])
+        }
+        resultExtractor.invoke(mapper, map)
+    }
 
     fun <T : Any> perform(resultExtractor: (String) -> T?): T? {
         val baseUrl = config.url + "/ws/v2.0/output.json/" + path;

@@ -36,7 +36,7 @@ class WantsListService(config: CardmarketApiConfiguration) : AbstractService(con
                     element("minCondition", it.minCondition)
                     element("wishPrice", it.wishPrice)
                     element("mailAlert", it.mailAlert)
-                    element("idLanguage", it.languages)
+                    it.languages.forEach { language -> element("idLanguage", language) }
                     element("isFoil", it.isFoil)
                     element("isAltered", it.isAltered)
                     element("isSigned", it.isSigned)
@@ -48,7 +48,7 @@ class WantsListService(config: CardmarketApiConfiguration) : AbstractService(con
                     element("minCondition", it.minCondition)
                     element("wishPrice", it.wishPrice)
                     element("mailAlert", it.mailAlert)
-                    element("idLanguage", it.languages)
+                    it.languages.forEach { language -> element("idLanguage", language) }
                     element("isFoil", it.isFoil)
                     element("isAltered", it.isAltered)
                     element("isSigned", it.isSigned)
@@ -63,11 +63,15 @@ class WantsListService(config: CardmarketApiConfiguration) : AbstractService(con
         element("action", "editItem")
         "want" {
             element("idWant", wantsListItem.idWant)
+            when (wantsListItem) {
+                is ProductWant -> element("idProduct", wantsListItem.idProduct)
+                is MetaproductWant -> element("idMetaproduct", wantsListItem.idMetaproduct)
+            }
             element("count", wantsListItem.count)
             element("minCondition", wantsListItem.minCondition)
             element("wishPrice", wantsListItem.wishPrice)
             element("mailAlert", wantsListItem.mailAlert)
-            element("idLanguage", wantsListItem.languages)
+            wantsListItem.languages.forEach { language -> element("idLanguage", language) }
             element("isFoil", wantsListItem.isFoil)
             element("isAltered", wantsListItem.isAltered)
             element("isSigned", wantsListItem.isSigned)

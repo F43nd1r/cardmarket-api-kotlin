@@ -12,6 +12,7 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     jcenter()
+    mavenCentral()
     mavenLocal()
 }
 
@@ -31,6 +32,8 @@ dependencies {
     val junitVersion = "5.5.2"
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+    testImplementation("org.hamcrest:hamcrest-all:1.3")
+    testImplementation("com.natpryce:hamkrest:1.7.0.0")
 }
 
 tasks.withType<Test> {

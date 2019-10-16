@@ -54,6 +54,8 @@ data class ProductWant(override val idWant: String,
     override val type = "product"
 }
 
+fun Product.toWant(): ProductWant = ProductWant("", 1, 0.0, 0.0, false, this.idProduct, this, emptyList(), Condition.POOR, null, null, null, null)
+
 data class MetaproductWant(override val idWant: String,
                            override val count: Int,
                            override val wishPrice: Double,
@@ -69,3 +71,5 @@ data class MetaproductWant(override val idWant: String,
                            override val isFirstEd: Boolean?) : WantsListItem() {
     override val type = "metaproduct"
 }
+
+fun Metaproduct.toWant() : MetaproductWant = MetaproductWant("", 1, 0.0, 0.0, false, this.idMetaproduct, this, emptyList(), Condition.POOR, null, null, null, null)
