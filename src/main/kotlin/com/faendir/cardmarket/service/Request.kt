@@ -78,8 +78,6 @@ internal class Request(private val config: CardmarketApiConfiguration,
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" + content.toString(false)
     }
 
-    private fun encode(s: String): String = URLEncoder.encode(s, Charsets.UTF_8.name()).replace("+", "%20").replace("'", "%27")
-
     private fun createOauthHeader(url: String, method: Method, queryParams: Map<String, *>): String {
         val timestamp = "" + (System.currentTimeMillis() / 1000)
         val headerParams = mapOf("oauth_consumer_key" to config.appToken,
@@ -112,3 +110,5 @@ fun Node.element(name: String, value: Any) = element(name, value.toString())
 fun Node.element(name: String, value: Any?) {
     if (value != null) element(name, value)
 }
+
+fun encode(s: String): String = URLEncoder.encode(s, Charsets.UTF_8.name()).replace("+", "%20").replace("'", "%27")
