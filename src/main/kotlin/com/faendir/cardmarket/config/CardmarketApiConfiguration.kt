@@ -16,13 +16,13 @@ data class CardmarketApiConfiguration(val appToken: String, val appSecret: Strin
         private val access_token by stringType
         private val access_token_secret by stringType
         private val url by stringType
-        fun get(commandlineArgs: Array<String>): CardmarketApiConfiguration? {
-            return try {
-                val config = parseArgs(commandlineArgs, helpOutput = NullOutputStream.getInstance(), helpExit = { throw HelpExit() }).first overriding systemProperties() overriding EnvironmentVariables() overriding ConfigurationProperties.fromOptionalFile(File("cardmarket.properties")) overriding ConfigurationProperties.fromResource("default.properties")
-                CardmarketApiConfiguration(config[app_token], config[app_secret], config[access_token], config[access_token_secret], config[url])
-            } catch (e: HelpExit) {
-                null
-            }
+        fun get(commandlineArgs: Array<String> = emptyArray()): CardmarketApiConfiguration {
+            val config = parseArgs(commandlineArgs, helpOutput = NullOutputStream.getInstance(), helpExit = { throw HelpExit() }).first overriding
+                    systemProperties() overriding
+                    EnvironmentVariables() overriding
+                    ConfigurationProperties.fromOptionalFile(File("cardmarket.properties")) overriding
+                    ConfigurationProperties.fromResource("default.properties")
+            return CardmarketApiConfiguration(config[app_token], config[app_secret], config[access_token], config[access_token_secret], config[url])
         }
 
         private class HelpExit : Exception()

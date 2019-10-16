@@ -3,6 +3,7 @@ package com.faendir.cardmarket.service
 import com.faendir.cardmarket.config.CardmarketApiConfiguration
 import com.faendir.cardmarket.model.Article
 import com.faendir.cardmarket.model.Game
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 
 /**
  * @author lukas
@@ -11,7 +12,7 @@ import com.faendir.cardmarket.model.Game
 class StockService(config: CardmarketApiConfiguration) : AbstractService(config) {
     fun get(start: Int? = null): List<Article> = get(if (start != null) "stock/$start" else "stock").submit("article") ?: emptyList()
 
-    fun add(vararg articles: Article): Unit = post("stock").body {
+    fun add(vararg articles: Article): List<Article> = post("stock").body {
         articles.forEach {
             "article" {
                 element("idProduct", it.idProduct)
@@ -25,7 +26,10 @@ class StockService(config: CardmarketApiConfiguration) : AbstractService(config)
                 element("isPlayset", it.isPlayset)
             }
         }
-    }.submit() ?: Unit
+    }.submit{mapper, map ->
+        val list = mapper.convertValue(map["inserted"], jacksonTypeRef<List<Map<String,Any>>>())
+        list.map { mapper.convertValue(it["idArticle"], jacksonTypeRef<Article>()) }
+    } ?: emptyList()
 
     fun update(vararg articles: Article): Unit = put("stock").body {
         articles.forEach {

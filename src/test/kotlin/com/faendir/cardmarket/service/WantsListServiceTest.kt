@@ -13,7 +13,7 @@ import org.junit.jupiter.api.TestInstance
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class WantsListServiceTest {
-    private val config = CardmarketApiConfiguration.get(emptyArray())!!
+    private val config = CardmarketApiConfiguration.get()
     private val service = WantsListService(config)
     private val marketplaceService = MarketplaceService(config)
 

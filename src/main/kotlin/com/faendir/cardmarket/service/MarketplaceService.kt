@@ -14,11 +14,11 @@ class MarketplaceService(config: CardmarketApiConfiguration) : AbstractService(c
 
     fun getGames(): List<Game> = get("games").submit("game") ?: emptyList()
 
-    fun getExpansions(idGame: Int): List<Expansion> = get("games/$idGame/expansions").submit("expansion") ?: emptyList()
+    fun getExpansions(game: Game): List<Expansion> = get("games/${game.idGame}/expansions").submit("expansion") ?: emptyList()
 
-    fun getProductsByExpansion(idExpansion: Int): List<Product> = get("expansions/$idExpansion/singles").submit("single") ?: emptyList()
+    fun getProductsByExpansion(expansion: Expansion): List<Product> = get("expansions/${expansion.idExpansion}/singles").submit("single") ?: emptyList()
 
-    fun getProduct(id: Int): ProductDetails? = get("products/$id").submit("product")
+    fun getProductDetails(product: Product): ProductDetails = get("products/${product.idProduct}").submit("product")!!
 
     fun findProduct(search: String, exact: Boolean? = null, idGame: Int? = null, idLanguage: Int? = null, partial: Pair<Int, Int>? = null): List<Product> =
             get("products/find").params("search" to search,
@@ -41,10 +41,10 @@ class MarketplaceService(config: CardmarketApiConfiguration) : AbstractService(c
                     "start" to partial?.first,
                     "maxResults" to partial?.second).submit("article") ?: emptyList()
 
-    fun getMetaproduct(id: Int): Metaproduct? = get("metaproducts/$id").submit { mapper, map ->
+    fun getMetaproduct(product: BaseProduct): Metaproduct = get("metaproducts/${product.idMetaproduct}").submit { mapper, map ->
         val metaproduct: Metaproduct? = mapper.convertValue(map["metaproduct"], jacksonTypeRef<Metaproduct>())
         metaproduct?.copy(products = mapper.convertValue(map["product"], jacksonTypeRef<List<Product>>()))
-    }
+    }!!
 
     fun findMetaproducts(search: String, exact: Boolean? = null, idGame: Int? = null, idLanguage: Int? = null): List<Metaproduct> =
             get("metaproducts/find").params("search" to search,

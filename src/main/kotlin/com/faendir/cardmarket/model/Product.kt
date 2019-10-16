@@ -16,7 +16,7 @@ data class Product(override val idProduct: Int,
                    override val categoryName: String,
                    override val number: String,
                    override val rarity: String,
-                   val expansionName: String) : AbstractProduct() {
+                   val expansionName: String) : BaseProduct {
     override fun equals(other: Any?): Boolean = this === other || (javaClass == other?.javaClass && idProduct == (other as Product).idProduct)
 
     override fun hashCode(): Int = idProduct

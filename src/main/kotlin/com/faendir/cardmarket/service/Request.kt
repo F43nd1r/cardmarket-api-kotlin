@@ -51,7 +51,7 @@ class Request(private val config: CardmarketApiConfiguration,
 
     fun <T : Any> perform(resultExtractor: (String) -> T?): T? {
         val baseUrl = config.url + "/ws/v2.0/output.json/" + path;
-        val url = if (params.isNotEmpty()) params.entries.joinToString(prefix = "$baseUrl?") { "${it.key}=${encode(it.value.toString())}" } else baseUrl
+        val url = if (params.isNotEmpty()) params.entries.joinToString(prefix = "$baseUrl?", separator = "&") { "${it.key}=${encode(it.value.toString())}" } else baseUrl
         val (_, response, result) = method.fuel.invoke(url).also { request ->
             body?.let { request.body(toXml(it), Charsets.UTF_8) }
         }.header("Authorization", createOauthHeader(baseUrl, method, params))

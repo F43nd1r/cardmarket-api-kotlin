@@ -14,7 +14,7 @@ import java.time.ZoneOffset
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class AccountServiceTest {
-    private val service = AccountService(CardmarketApiConfiguration.get(emptyArray())!!)
+    private val service = AccountService(CardmarketApiConfiguration.get())
 
     @Test
     fun getAccount() {

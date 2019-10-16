@@ -22,4 +22,3 @@ data class Article(val idArticle: Int,
     override fun hashCode(): Int = idArticle
 }
 
-data class Language(val idLanguage: Int, val languageName: String)

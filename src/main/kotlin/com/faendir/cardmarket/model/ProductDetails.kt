@@ -1,5 +1,7 @@
 package com.faendir.cardmarket.model
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 /**
  * @author lukas
  * @since 01.10.19
@@ -17,7 +19,8 @@ data class ProductDetails(override val idProduct: Int,
                           override val rarity: String,
                           val expansion: ExpansionInfo,
                           val priceGuide: PriceGuide,
-                          val reprint: List<Reprint> = emptyList()) : AbstractProduct() {
+                          @JsonProperty("reprint")
+                          val reprints: List<Reprint> = emptyList()) : BaseProduct {
     override fun equals(other: Any?): Boolean = this === other || (javaClass == other?.javaClass && idProduct == (other as ProductDetails).idProduct)
 
     override fun hashCode(): Int = idProduct
