@@ -12,6 +12,7 @@ import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.isEmpty
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import kotlin.random.Random
 
 /**
  * @author lukas
@@ -25,7 +26,7 @@ internal class ShoppingCartServiceTest {
 
     @Test
     fun checkout() {
-        val article = marketplaceService.findArticles(marketplaceService.findProduct("Vine Mare")[0], partial = 0 to 1)[0]
+        val article = marketplaceService.findArticles(marketplaceService.findProduct("Vine Mare")[0], partial = 0 to 100)[Random.nextInt(100)]
         service.addArticles(article)
         val cart = service.getShoppingCart()
         assertThat(cart, has(ShoppingCart::reservations, anyElement(has(Reservation::article, anyElement(equalTo(article))))))
