@@ -6,20 +6,19 @@ import com.fasterxml.jackson.annotation.JsonCreator
  * @author lukas
  * @since 30.09.19
  */
-abstract class AbstractUser {
-    abstract val idUser: Int
-    abstract val username: String
-    abstract val isCommercial: UserType
-    abstract val riskGroup: RiskGroup
-    abstract val reputation: Reputation
-    abstract val sellCount: Int
-    abstract val soldItems: Int
-    abstract val avgShippingTime: Int
-    abstract val onVacation: Boolean
-    abstract val name: Name
-    abstract val email: String
-    abstract val phone: String?
-    abstract val vat: String?
+interface BaseUser : HasUserId {
+    val username: String
+    val isCommercial: UserType
+    val riskGroup: RiskGroup
+    val reputation: Reputation
+    val sellCount: Int
+    val soldItems: Int
+    val avgShippingTime: Int
+    val onVacation: Boolean
+    val name: Name
+    val email: String
+    val phone: String?
+    val vat: String?
 }
 
 enum class RiskGroup(val value: Int) {

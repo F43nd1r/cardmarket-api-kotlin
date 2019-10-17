@@ -18,7 +18,7 @@ class MarketplaceService(config: CardmarketApiConfiguration) : AbstractService(c
 
     fun getProductsByExpansion(expansion: Expansion): List<Product> = get("expansions/${expansion.idExpansion}/singles").submit("single") ?: emptyList()
 
-    fun getProductDetails(product: Product): ProductDetails = get("products/${product.idProduct}").submit("product")!!
+    fun getProductDetails(product: HasProductId): ProductDetails = get("products/${product.idProduct}").submit("product")!!
 
     fun findProduct(search: String, exact: Boolean? = null, idGame: Int? = null, idLanguage: Int? = null, partial: Pair<Int, Int>? = null): List<Product> =
             get("products/find").params("search" to search,
@@ -28,7 +28,7 @@ class MarketplaceService(config: CardmarketApiConfiguration) : AbstractService(c
                     "start" to partial?.first,
                     "maxResults" to partial?.second).submit("product") ?: emptyList()
 
-    fun findArticles(product: Product, userType: UserType? = null, minUserScore: Reputation? = null, idLanguage: Int? = null, minCondition: Condition? = null, isFoil: Boolean? = null,
+    fun findArticles(product: HasProductId, userType: UserType? = null, minUserScore: Reputation? = null, idLanguage: Int? = null, minCondition: Condition? = null, isFoil: Boolean? = null,
                      isSigned: Boolean? = null, isAltered: Boolean? = null, minAvailable: Int? = null, partial: Pair<Int, Int>? = null): List<Article> =
             get("articles/${product.idProduct}").params("userType" to userType,
                     "minUserScore" to minUserScore,
@@ -41,7 +41,7 @@ class MarketplaceService(config: CardmarketApiConfiguration) : AbstractService(c
                     "start" to partial?.first,
                     "maxResults" to partial?.second).submit("article") ?: emptyList()
 
-    fun getMetaproduct(product: BaseProduct): Metaproduct = get("metaproducts/${product.idMetaproduct}").submit { mapper, map ->
+    fun getMetaproduct(product: HasMetaproductId): Metaproduct = get("metaproducts/${product.idMetaproduct}").submit { mapper, map ->
         val metaproduct: Metaproduct? = mapper.convertValue(map["metaproduct"], jacksonTypeRef<Metaproduct>())
         metaproduct?.copy(products = mapper.convertValue(map["product"], jacksonTypeRef<List<Product>>()))
     }!!
@@ -64,14 +64,14 @@ class MarketplaceService(config: CardmarketApiConfiguration) : AbstractService(c
 
     fun findUsers(name: String): List<User> = get("users/find").params("search" to name).submit("user") ?: emptyList()
 
-    fun getUserArticles(idUser: Int, idGame: Int? = null, partial: Pair<Int, Int>? = null): List<Article> =
-            get("users/$idUser/articles").params(
+    fun getUserArticles(user: HasUserId, idGame: Int? = null, partial: Pair<Int, Int>? = null): List<Article> =
+            get("users/${user.idUser}/articles").params(
                     "idGame" to idGame,
                     "start" to partial?.first,
                     "maxResults" to partial?.second).submit("article") ?: emptyList()
 
-    fun getUserArticles(idUser: String, idGame: Int? = null, partial: Pair<Int, Int>? = null): List<Article> =
-            get("users/$idUser/articles").params(
+    fun getUserArticles(userName: String, idGame: Int? = null, partial: Pair<Int, Int>? = null): List<Article> =
+            get("users/$userName/articles").params(
                     "idGame" to idGame,
                     "start" to partial?.first,
                     "maxResults" to partial?.second).submit("article") ?: emptyList()

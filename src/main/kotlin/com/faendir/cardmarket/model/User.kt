@@ -20,7 +20,7 @@ data class User(override val idUser: Int,
                 override val sellCount: Int,
                 override val soldItems: Int,
                 override val avgShippingTime: Int,
-                override val onVacation: Boolean) : AbstractUser() {
+                override val onVacation: Boolean) : BaseUser() {
     override fun equals(other: Any?): Boolean = this === other || (javaClass == other?.javaClass && idUser == (other as User).idUser)
 
     override fun hashCode(): Int = idUser

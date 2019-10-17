@@ -36,7 +36,7 @@ data class Account(override val idUser: Int,
                    val moneyDetails: MoneyDetails,
                    val bankAccount: BankAccount,
                    val articlesInShoppingCart: Int,
-                   val unreadMessages: Int) : AbstractUser() {
+                   val unreadMessages: Int) : BaseUser {
     override fun equals(other: Any?): Boolean = this === other || (javaClass == other?.javaClass && idUser == (other as Account).idUser)
 
     override fun hashCode(): Int = idUser

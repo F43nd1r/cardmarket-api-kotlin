@@ -43,14 +43,14 @@ data class ProductWant(override val idWant: String,
                        override val wishPrice: Double,
                        override val fromPrice: Double,
                        override val mailAlert: Boolean,
-                       val idProduct: Int,
+                       override val idProduct: Int,
                        val product: Product,
                        override val languages: List<Int>,
                        override val minCondition: Condition,
                        override val isFoil: Boolean?,
                        override val isSigned: Boolean?,
                        override val isAltered: Boolean?,
-                       override val isFirstEd: Boolean?) : WantsListItem() {
+                       override val isFirstEd: Boolean?) : WantsListItem(), HasProductId {
     override val type = "product"
 }
 
@@ -61,14 +61,14 @@ data class MetaproductWant(override val idWant: String,
                            override val wishPrice: Double,
                            override val fromPrice: Double,
                            override val mailAlert: Boolean,
-                           val idMetaproduct: Int,
+                           override val idMetaproduct: Int,
                            val metaproduct: Metaproduct,
                            override val languages: List<Int>,
                            override val minCondition: Condition,
                            override val isFoil: Boolean?,
                            override val isSigned: Boolean?,
                            override val isAltered: Boolean?,
-                           override val isFirstEd: Boolean?) : WantsListItem() {
+                           override val isFirstEd: Boolean?) : WantsListItem(), HasMetaproductId {
     override val type = "metaproduct"
 }
 

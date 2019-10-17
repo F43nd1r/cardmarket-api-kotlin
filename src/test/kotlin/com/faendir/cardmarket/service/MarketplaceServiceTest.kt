@@ -73,7 +73,9 @@ internal class MarketplaceServiceTest {
     fun userArticles() {
         val product = service.findProduct(name)[0]
         val article = stockService.add(Article(0, product.idProduct, Language.ENGLISH, "", 10.0, 1, false, null, Condition.NEAR_MINT, isFoil = false, isSigned = false, isAltered = false, isPlayset = false))[0]
-        assertThat(service.getUserArticles(65310125), anyElement(has(Article::idProduct, equalTo(product.idProduct))))
+        assertThat(service.getUserArticles(object : HasUserId {
+            override val idUser = 65310125
+        }), anyElement(has(Article::idProduct, equalTo(product.idProduct))))
         assertThat(service.getUserArticles("KotlinTest"), anyElement(has(Article::idProduct, equalTo(product.idProduct))))
         stockService.remove(article)
     }
