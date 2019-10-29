@@ -12,6 +12,6 @@ interface BaseProduct : HasProductId, HasMetaproductId {
     val image: String
     val gameName: String
     val categoryName: String
-    val number: String
+    val number: String?
     val rarity: String
 }
